@@ -20,6 +20,10 @@ def pdf_ingestion_node(state:AgentState) -> AgentState:
         return {"error": f"Failed to parse pdf: {str(e)}"}
 
 def extractor_node(state:AgentState) -> AgentState:
+    """
+    Takes raw_text from state, prompts an LLM with a Pydantic schema,
+    and extracts structured financial metrics.
+    """
     raw_text = state.get("raw_text")
     if not raw_text:
         return {"error": "No raw text found in state to extract metrics from"}
