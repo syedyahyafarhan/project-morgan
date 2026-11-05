@@ -29,7 +29,7 @@ def extractor_node(state:AgentState) -> AgentState:
         return {"error": "No raw text found in state to extract metrics from"}
     try:
         text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=14000,
+                chunk_size=13000,
                 chunk_overlap=500)
             
         
