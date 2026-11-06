@@ -2,9 +2,13 @@ import os
 from pypdf import PdfReader
 from state import AgentState, FinancialAdvisorState
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from pathlib import Path
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pydantic import BaseModel, Field
+
+llm = ChatGoogleGenerativeAI(model="gemini-3.8-flash", temperature=0)
+# llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0)
 
 def pdf_ingestion_node(state:AgentState) -> AgentState:
     """Reads the PDF file path from state, extracts the text and updates the raw_text"""
@@ -29,12 +33,13 @@ def extractor_node(state:AgentState) -> AgentState:
         return {"error": "No raw text found in state to extract metrics from"}
     try:
         text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=10000,
+                chunk_size=15000,
                 chunk_overlap=500)
             
         
         chunks = text_splitter.create_documents([raw_text])
-        llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0)
+        
+        
         structured_llm = llm.with_structured_output(FinancialAdvisorState)
 
         datajoined = {}
@@ -65,7 +70,8 @@ def verifier_node(state:AgentState) -> AgentState:
             "verification_feedback": "Extraction result was completely empty. No metrics found."
         }
     try:
-        llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0)
+        
+        
         system_prompt = f"""
         You are a strict financial data validator and quality assurance auditor. 
         Review the following extracted financial metrics from a corporate filing:
